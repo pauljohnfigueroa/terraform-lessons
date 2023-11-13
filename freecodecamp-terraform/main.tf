@@ -136,7 +136,7 @@ resource "aws_eip" "two" {
 # Create EC2 instance
 resource "aws_instance" "ubuntu" {
   ami               = "ami-06aa3f7caf3a30282"
-  instance_type     = "t2.micro"
+  instance_type     = var.ec2_instance_type
   availability_zone = "us-east-1a"
   key_name          = "terraform-key"
 
@@ -153,7 +153,7 @@ resource "aws_instance" "ubuntu" {
                 sudo bash -c "echo My Very First Web Server with Terraform >> /var/www/html/index.html"
                 EOF
   tags = {
-    Name = "TerraformInstance"
+    Name = var.ec2_instance1_name
   }
 }
 
@@ -182,28 +182,9 @@ resource "aws_instance" "ubuntu2" {
   }
 }
 
-# OUTPUT
-output "server_private_ip" {
-  value = aws_instance.ubuntu.private_ip
-}
+module "my_ec2_instance" {
+  source = "./modules"
 
-output "server_public_ip" {
-  value = aws_instance.ubuntu.public_ip
-}
-
-output "server_id" {
-  value = aws_instance.ubuntu.id
-}
-
-# 2nd EC2 instance
-output "server2_private_ip" {
-  value = aws_instance.ubuntu2.private_ip
-}
-
-output "server2_public_ip" {
-  value = aws_instance.ubuntu2.public_ip
-}
-
-output "server2_id" {
-  value = aws_instance.ubuntu2.id
+  # ec2_instance_type = var.ec2_instance_type
+  # ec2_instance1_name = var.ec2_instance1_name
 }
