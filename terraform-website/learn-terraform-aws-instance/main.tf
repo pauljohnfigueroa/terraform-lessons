@@ -21,11 +21,13 @@ provider "aws" {
 # A resource might be a physical or virtual component such as an 
 # EC2 instance, or it can be a logical resource such as a Heroku application.
 resource "aws_instance" "app_server" {
+  count = 2
+
   ami           = "ami-0230bd60aa48260c6"
   instance_type = "t2.micro"
 
   tags = {
-    Name = "TerraformTutorialInstance"
+    Name = "TerraformTutorialInstance ${count.index}"
   }
 }
 
