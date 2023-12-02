@@ -12,27 +12,36 @@ provider "aws" {
   region = "us-east-1"
 }
 
+locals {
+  company_name = "PurpleHaze Corp."
+  foo          = upper("foobar")
+}
+
 resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
-    enable_dns_hostnames = true
-    enable_dns_support = true
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+
   tags = {
-    Name = "My VPC"
+    Name = "${local.company_name}_VPC"
+    baz  = local.foo
   }
 }
 
 resource "aws_subnet" "subnet1" {
-    vpc_id = aws_vpc.main.id
-    availability_zone = "us-east-1b"
-}
-
-
-resource "aws_instance" "foobar" {
-  ami           = "ami-0230bd60aa48260c6"
-  instance_type = "t2.micro"
+  vpc_id            = aws_vpc.main.id # create this subnet in this VPC
+  availability_zone = "us-east-1b"
+  cidr_block        = "10.0.1.0/24"
   tags = {
-    Name = "Foobar"
+    Name = "${local.company_name}_Subnet_1"
+    baz  = local.foo
   }
 }
 
-
+resource "aws_instance" "foobar" {
+  ami                         = "ami-0230bd60aa48260c6"
+  instance_type               = var.my_instance_type
+  subnet_id                   = aws_subnet.subnet1.id # launch this instance in this instance
+  associate_public_ip_address = true
+  tags                        = var.instance_tags
+}
